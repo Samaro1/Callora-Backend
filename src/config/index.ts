@@ -1,20 +1,32 @@
+import { env } from './env.js';
+
 export const config = {
-  port: Number(process.env.PORT ?? 3000),
-  nodeEnv: process.env.NODE_ENV ?? 'development',
-  /**
-   * Primary PostgreSQL connection string used by the shared pg.Pool.
-   * Example (matches docker-compose): postgresql://postgres:postgres@postgres:5432/callora?schema=public
-   */
-  databaseUrl:
-    process.env.DATABASE_URL ??
-    'postgresql://postgres:postgres@localhost:5432/callora?schema=public',
-  /**
-   * Connection pool tuning. These can be overridden via environment variables
-   * but have sensible defaults for local development.
-   */
+  port: env.PORT,
+  nodeEnv: env.NODE_ENV,
+  databaseUrl: env.DATABASE_URL,
   dbPool: {
-    max: Number(process.env.DB_POOL_MAX ?? 10),
-    idleTimeoutMillis: Number(process.env.DB_IDLE_TIMEOUT_MS ?? 30_000),
-    connectionTimeoutMillis: Number(process.env.DB_CONN_TIMEOUT_MS ?? 2_000),
+    max: env.DB_POOL_MAX,
+    idleTimeoutMillis: env.DB_IDLE_TIMEOUT_MS,
+    connectionTimeoutMillis: env.DB_CONN_TIMEOUT_MS,
   },
+  auth: {
+    jwtSecret: env.JWT_SECRET,
+    adminApiKey: env.ADMIN_API_KEY,
+    metricsApiKey: env.METRICS_API_KEY,
+  },
+  proxy: {
+    upstreamUrl: env.UPSTREAM_URL,
+    timeoutMs: env.PROXY_TIMEOUT_MS,
+  },
+  cors: {
+    allowedOrigins: env.CORS_ALLOWED_ORIGINS.split(',').map((o) => o.trim()),
+  },
+  logging: {
+    level: env.LOG_LEVEL,
+  },
+  profiling: {
+    enabled: env.GATEWAY_PROFILING_ENABLED,
+  },
+  rateLimitWindowMs: 60_000,
+  rateLimitMaxRequests: 100,
 };
