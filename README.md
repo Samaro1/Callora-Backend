@@ -118,4 +118,12 @@ The app validates all environment variables at startup using [Zod](https://zod.d
 | `LOG_LEVEL` | No | `info` | `trace` / `debug` / `info` / `warn` / `error` / `fatal` |
 | `GATEWAY_PROFILING_ENABLED` | No | `false` | Enable request profiling |
 
+## Production Shutdown Expectations
+
+- The server listens for `SIGTERM` and `SIGINT` and performs a graceful shutdown.
+- On shutdown, it stops accepting new HTTP requests, waits for active connections to finish, and closes database resources.
+- A 30 second timeout is enforced for in-flight connections; lingering sockets are destroyed to prevent hung termination.
+- Shutdown hooks are registered with `process.once(...)` to avoid duplicate execution during restarts.
+- The dev workflow (`npm run dev` with `tsx watch`) is preserved. Restarts trigger the same graceful path instead of abrupt termination.
+
 This repo is part of [Callora](https://github.com/your-org/callora). Frontend: `callora-frontend`. Contracts: `callora-contracts`.
